@@ -2,111 +2,117 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Expert;
+use App\Http\Requests\StoreExpertRequest;
+use App\Http\Requests\UpdateExpertRequest;
+use App\Services\ExpertService;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 
 class ExpertController extends Controller
 {
+    protected ExpertService $service;
+
+    public function __construct(ExpertService $service)
+    {
+        $this->service = $service;
+    }
+
     /**
      * Menampilkan semua expert.
      */
     public function index(): JsonResponse
     {
-        $experts = Expert::with([
-            'user',
-            'category',
-        ])->get();
-
-        return response()->json($experts, 200);
+        return response()->json([
+            'status' => 'success',
+            'data' => $this->service->all(),
+            'message' => 'Berhasil menarik semua data ahli.',
+        ], 200);
     }
 
     /**
      * Menyimpan expert baru.
      */
-    public function store(Request $request): JsonResponse
-    {
-        $validated = $request->validate([
-            'user_id' => 'required|exists:users,id',
-            'category_id' => 'required|exists:categories,id',
-            'location' => 'required|string|max:100',
-            'experience' => 'nullable|string|max:50',
-            'rating' => 'nullable|numeric|min:0|max:5',
-            'review_count' => 'nullable|integer|min:0',
-            'completed_jobs' => 'nullable|integer|min:0',
-            'starting_price' => 'nullable|numeric|min:0',
-            'banner' => 'nullable|string',
-            'bio' => 'nullable|string',
-            'operating_hours' => 'nullable|string|max:100',
-            'verified' => 'nullable|boolean',
-            'verification_status' =>
-                'nullable|in:pending,approved,rejected,revision',
-        ]);
+    public function store(
+        StoreExpertRequest $request
+    ): JsonResponse {
+        $expert = $this->service->create(
+            $request->validated()
+        );
 
-        $expert = Expert::create($validated);
-
-        $expert->load([
-            'user',
-            'category',
-        ]);
-
-        return response()->json($expert, 201);
+        return response()->json([
+            'status' => 'success',
+            'data' => $expert,
+            'message' => 'Data ahli berhasil dibuat.',
+        ], 201);
     }
 
     /**
      * Menampilkan satu expert.
      */
-    public function show(Expert $expert): JsonResponse
+    public function show(int $id): JsonResponse
     {
-        $expert->load([
-            'user',
-            'category',
-        ]);
+        try {
+            $expert = $this->service->find($id);
 
-        return response()->json($expert, 200);
+            return response()->json([
+                'status' => 'success',
+                'data' => $expert,
+                'message' => 'Berhasil menarik satu data ahli.',
+            ], 200);
+        } catch (\Exception $exception) {
+            return response()->json([
+                'status' => 'error',
+                'data' => null,
+                'message' => 'Data ahli tidak ditemukan.',
+            ], 404);
+        }
     }
 
     /**
      * Mengubah data expert.
      */
     public function update(
-        Request $request,
-        Expert $expert
+        UpdateExpertRequest $request,
+        int $id
     ): JsonResponse {
-        $validated = $request->validate([
-            'user_id' => 'sometimes|exists:users,id',
-            'category_id' => 'sometimes|exists:categories,id',
-            'location' => 'sometimes|string|max:100',
-            'experience' => 'nullable|string|max:50',
-            'rating' => 'nullable|numeric|min:0|max:5',
-            'review_count' => 'nullable|integer|min:0',
-            'completed_jobs' => 'nullable|integer|min:0',
-            'starting_price' => 'nullable|numeric|min:0',
-            'banner' => 'nullable|string',
-            'bio' => 'nullable|string',
-            'operating_hours' => 'nullable|string|max:100',
-            'verified' => 'nullable|boolean',
-            'verification_status' =>
-                'nullable|in:pending,approved,rejected,revision',
-        ]);
+        try {
+            $expert = $this->service->update(
+                $id,
+                $request->validated()
+            );
 
-        $expert->update($validated);
-
-        $expert->load([
-            'user',
-            'category',
-        ]);
-
-        return response()->json($expert, 200);
+            return response()->json([
+                'status' => 'success',
+                'data' => $expert,
+                'message' => 'Data ahli berhasil diperbarui.',
+            ], 200);
+        } catch (\Exception $exception) {
+            return response()->json([
+                'status' => 'error',
+                'data' => null,
+                'message' => 'Data ahli tidak ditemukan.',
+            ], 404);
+        }
     }
 
     /**
      * Menghapus expert.
      */
-    public function destroy(Expert $expert): JsonResponse
+    public function destroy(int $id): JsonResponse
     {
-        $expert->delete();
+        try {
+            $this->service->delete($id);
 
-        return response()->json(null, 204);
+            return response()->json([
+                'status' => 'success',
+                'data' => null,
+                'message' => 'Data ahli berhasil dihapus.',
+            ], 200);
+        } catch (\Exception $exception) {
+            return response()->json([
+                'status' => 'error',
+                'data' => null,
+                'message' => 'Data ahli tidak ditemukan.',
+            ], 404);
+        }
     }
 }
