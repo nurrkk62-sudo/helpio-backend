@@ -14,9 +14,6 @@ class Category extends Model
         'name',
     ];
 
-    /**
-     * Relasi Category memiliki banyak Expert.
-     */
     public function experts(): HasMany
     {
         return $this->hasMany(Expert::class);
