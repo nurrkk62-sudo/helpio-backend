@@ -31,6 +31,11 @@ Route::prefix('auth')->group(function () {
     );
 
     Route::post(
+        '/register-expert',
+        [AuthController::class, 'registerExpert']
+    );
+
+    Route::post(
         '/login',
         [AuthController::class, 'login']
     );
