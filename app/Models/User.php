@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -10,7 +11,9 @@ use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
 {
-    use HasApiTokens, HasFactory, Notifiable;
+    use HasApiTokens;
+    use HasFactory;
+    use Notifiable;
 
     /**
      * Atribut yang boleh diisi secara mass assignment.
@@ -23,10 +26,11 @@ class User extends Authenticatable
         'role',
         'avatar',
         'address',
+        'phone_verified_at',
     ];
 
     /**
-     * Atribut yang disembunyikan saat response JSON.
+     * Atribut yang disembunyikan dari response JSON.
      */
     protected $hidden = [
         'password',
@@ -34,21 +38,32 @@ class User extends Authenticatable
     ];
 
     /**
-     * Konversi tipe data atribut.
+     * Casting atribut model.
      */
     protected function casts(): array
     {
         return [
             'email_verified_at' => 'datetime',
+            'phone_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
     }
 
     /**
-     * Relasi User memiliki satu profil Expert.
+     * Relasi user dengan profil expert.
      */
     public function expert(): HasOne
     {
         return $this->hasOne(Expert::class);
+    }
+
+    /**
+     * Relasi user dengan OTP verification.
+     */
+    public function otpVerifications(): HasMany
+    {
+        return $this->hasMany(
+            OtpVerification::class
+        );
     }
 }
