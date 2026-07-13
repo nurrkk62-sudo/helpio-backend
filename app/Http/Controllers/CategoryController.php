@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Category;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use App\Http\Requests\StoreCategoryRequest;
 
 class CategoryController extends BaseController
 {
@@ -24,43 +25,16 @@ class CategoryController extends BaseController
     /**
      * Menyimpan kategori baru.
      */
-    public function store(Request $request): JsonResponse
+    public function store(StoreCategoryRequest $request): JsonResponse
 {
-    try {
+    $category = Category::create($request->validated());
 
-        $validated = $request->validate([
-            'name' => 'required|string|max:255|unique:categories,name',
-        ]);
-
-        $category = Category::create($validated);
-
-        return $this->successResponse(
-            $category,
-            'Kategori berhasil ditambahkan.',
-            201
-        );
-
-    } catch (\Exception $e) {
-
-        return response()->json([
-            'message' => $e->getMessage(),
-            'line' => $e->getLine(),
-            'file' => $e->getFile()
-        ],500);
-
-    }
+    return $this->successResponse(
+        $category,
+        'Kategori berhasil ditambahkan.',
+        201
+    );
 }
-
-    /**
-     * Menampilkan satu kategori.
-     */
-    public function show(Category $category): JsonResponse
-    {
-        return $this->successResponse(
-            $category,
-            'Detail kategori berhasil diambil.'
-        );
-    }
 
     /**
      * Mengubah data kategori.
