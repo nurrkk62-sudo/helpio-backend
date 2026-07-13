@@ -6,7 +6,7 @@ use App\Models\Category;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
-class CategoryController extends Controller
+class CategoryController extends BaseController
 {
     /**
      * Menampilkan semua kategori.
@@ -15,29 +15,51 @@ class CategoryController extends Controller
     {
         $categories = Category::all();
 
-        return response()->json($categories, 200);
+        return $this->successResponse(
+            $categories,
+            'Daftar kategori berhasil diambil.'
+        );
     }
 
     /**
      * Menyimpan kategori baru.
      */
     public function store(Request $request): JsonResponse
-    {
+{
+    try {
+
         $validated = $request->validate([
             'name' => 'required|string|max:255|unique:categories,name',
         ]);
 
         $category = Category::create($validated);
 
-        return response()->json($category, 201);
+        return $this->successResponse(
+            $category,
+            'Kategori berhasil ditambahkan.',
+            201
+        );
+
+    } catch (\Exception $e) {
+
+        return response()->json([
+            'message' => $e->getMessage(),
+            'line' => $e->getLine(),
+            'file' => $e->getFile()
+        ],500);
+
     }
+}
 
     /**
      * Menampilkan satu kategori.
      */
     public function show(Category $category): JsonResponse
     {
-        return response()->json($category, 200);
+        return $this->successResponse(
+            $category,
+            'Detail kategori berhasil diambil.'
+        );
     }
 
     /**
@@ -53,7 +75,10 @@ class CategoryController extends Controller
 
         $category->update($validated);
 
-        return response()->json($category, 200);
+        return $this->successResponse(
+            $category,
+            'Kategori berhasil diperbarui.'
+        );
     }
 
     /**
@@ -63,6 +88,9 @@ class CategoryController extends Controller
     {
         $category->delete();
 
-        return response()->json(null, 204);
+        return $this->successResponse(
+            null,
+            'Kategori berhasil dihapus.'
+        );
     }
 }
