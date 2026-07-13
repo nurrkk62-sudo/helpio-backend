@@ -3,8 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\RegisterExpertRequest;
+use App\Http\Requests\SendOtpRequest;
+use App\Http\Requests\VerifyOtpRequest;
 use App\Models\User;
 use App\Services\AuthService;
+use App\Services\OtpService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -14,10 +17,14 @@ class AuthController extends Controller
 {
     protected AuthService $authService;
 
+    protected OtpService $otpService;
+
     public function __construct(
-        AuthService $authService
+        AuthService $authService,
+        OtpService $otpService
     ) {
         $this->authService = $authService;
+        $this->otpService = $otpService;
     }
 
     /**
@@ -99,6 +106,80 @@ class AuthController extends Controller
             'data' => $result,
             'message' => 'Expert berhasil terdaftar.',
         ], 201);
+    }
+
+    /**
+     * Mengirim OTP WhatsApp.
+     */
+    public function sendOtp(
+        SendOtpRequest $request
+    ): JsonResponse {
+        $user = User::where(
+            'phone',
+            $request->validated('phone')
+        )->firstOrFail();
+
+        if ($user->phone_verified_at !== null) {
+            return response()->json([
+                'status' => 'error',
+                'data' => null,
+                'message' =>
+                    'Nomor WhatsApp sudah diverifikasi.',
+            ], 422);
+        }
+
+        $code = $this->otpService->generate($user);
+
+        return response()->json([
+            'status' => 'success',
+            'data' => [
+                'phone' => $user->phone,
+
+                /*
+                 * Hanya untuk development.
+                 * Hapus saat provider WhatsApp aktif.
+                 */
+                'debug_otp' => $code,
+            ],
+            'message' => 'Kode OTP berhasil dibuat.',
+        ], 200);
+    }
+
+    /**
+     * Verifikasi OTP WhatsApp.
+     */
+    public function verifyOtp(
+        VerifyOtpRequest $request
+    ): JsonResponse {
+        $validated = $request->validated();
+
+        $user = User::where(
+            'phone',
+            $validated['phone']
+        )->firstOrFail();
+
+        if ($user->phone_verified_at !== null) {
+            return response()->json([
+                'status' => 'error',
+                'data' => null,
+                'message' =>
+                    'Nomor WhatsApp sudah diverifikasi.',
+            ], 422);
+        }
+
+        $this->otpService->verify(
+            $user,
+            $validated['code']
+        );
+
+        return response()->json([
+            'status' => 'success',
+            'data' => [
+                'user' => $user->fresh(),
+            ],
+            'message' =>
+                'Nomor WhatsApp berhasil diverifikasi.',
+        ], 200);
     }
 
     /**

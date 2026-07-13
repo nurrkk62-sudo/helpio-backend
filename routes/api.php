@@ -25,17 +25,41 @@ Route::get('/test', function () {
 */
 
 Route::prefix('auth')->group(function () {
-    Route::post('/register-user', [AuthController::class, 'register']);
-    Route::post('/register-expert', [AuthController::class, 'registerExpert']);
-    Route::post('/login', [AuthController::class, 'login']);
+    Route::post(
+        '/register-user',
+        [AuthController::class, 'register']
+    );
 
-    Route::middleware('auth:sanctum')->get('/me', function (Request $request) {
-        return response()->json([
-            'status' => 'success',
-            'data' => $request->user(),
-            'message' => 'Data user berhasil diambil.',
-        ], 200);
-    });
+    Route::post(
+        '/register-expert',
+        [AuthController::class, 'registerExpert']
+    );
+
+    Route::post(
+        '/send-otp',
+        [AuthController::class, 'sendOtp']
+    );
+
+    Route::post(
+        '/verify-otp',
+        [AuthController::class, 'verifyOtp']
+    );
+
+    Route::post(
+        '/login',
+        [AuthController::class, 'login']
+    );
+
+    Route::middleware('auth:sanctum')->get(
+        '/me',
+        function (Request $request) {
+            return response()->json([
+                'status' => 'success',
+                'data' => $request->user(),
+                'message' => 'Data user berhasil diambil.',
+            ], 200);
+        }
+    );
 });
 
 /*
@@ -51,10 +75,17 @@ Route::middleware('auth:sanctum')->group(function () {
     |--------------------------------------------------------------------------
     */
 
-    Route::apiResource('categories', CategoryController::class)->except(['destroy']);
+    Route::apiResource(
+        'categories',
+        CategoryController::class
+    )->except([
+        'destroy',
+    ]);
 
-    Route::delete('/categories/{category}', [CategoryController::class, 'destroy'])
-        ->middleware('role:admin');
+    Route::delete(
+        '/categories/{category}',
+        [CategoryController::class, 'destroy']
+    )->middleware('role:admin');
 
     /*
     |--------------------------------------------------------------------------
@@ -62,10 +93,19 @@ Route::middleware('auth:sanctum')->group(function () {
     |--------------------------------------------------------------------------
     */
 
-    Route::middleware(['throttle:60,1'])->group(function () {
-        Route::apiResource('experts', ExpertController::class)->except(['destroy']);
+    Route::middleware([
+        'throttle:60,1',
+    ])->group(function () {
+        Route::apiResource(
+            'experts',
+            ExpertController::class
+        )->except([
+            'destroy',
+        ]);
     });
 
-    Route::delete('/experts/{expert}', [ExpertController::class, 'destroy'])
-        ->middleware('role:admin');
+    Route::delete(
+        '/experts/{expert}',
+        [ExpertController::class, 'destroy']
+    )->middleware('role:admin');
 });
