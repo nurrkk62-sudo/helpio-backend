@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\RegisterExpertRequest;
 use App\Models\User;
+use App\Services\AuthService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -10,6 +12,14 @@ use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
 {
+    protected AuthService $authService;
+
+    public function __construct(
+        AuthService $authService
+    ) {
+        $this->authService = $authService;
+    }
+
     /**
      * Register user baru.
      */
@@ -21,22 +31,27 @@ class AuthController extends Controller
                 'string',
                 'max:255',
             ],
+
             'email' => [
                 'required',
                 'email',
                 'unique:users,email',
             ],
+
             'password' => [
                 'required',
                 'string',
                 'min:6',
                 'confirmed',
             ],
+
             'phone' => [
                 'required',
                 'string',
                 'max:20',
+                'unique:users,phone',
             ],
+
             'address' => [
                 'nullable',
                 'string',
@@ -51,6 +66,7 @@ class AuthController extends Controller
             ),
             'phone' => $validated['phone'],
             'role' => 'user',
+            'avatar' => null,
             'address' => $validated['address'] ?? null,
         ]);
 
@@ -69,6 +85,23 @@ class AuthController extends Controller
     }
 
     /**
+     * Register expert baru.
+     */
+    public function registerExpert(
+        RegisterExpertRequest $request
+    ): JsonResponse {
+        $result = $this->authService->registerExpert(
+            $request->validated()
+        );
+
+        return response()->json([
+            'status' => 'success',
+            'data' => $result,
+            'message' => 'Expert berhasil terdaftar.',
+        ], 201);
+    }
+
+    /**
      * Login user.
      */
     public function login(Request $request): JsonResponse
@@ -78,6 +111,7 @@ class AuthController extends Controller
                 'required',
                 'email',
             ],
+
             'password' => [
                 'required',
             ],
