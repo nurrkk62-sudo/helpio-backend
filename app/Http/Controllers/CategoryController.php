@@ -5,8 +5,9 @@ namespace App\Http\Controllers;
 use App\Models\Category;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use App\Http\Requests\StoreCategoryRequest;
 
-class CategoryController extends Controller
+class CategoryController extends BaseController
 {
     /**
      * Menampilkan semua kategori.
@@ -15,30 +16,25 @@ class CategoryController extends Controller
     {
         $categories = Category::all();
 
-        return response()->json($categories, 200);
+        return $this->successResponse(
+            $categories,
+            'Daftar kategori berhasil diambil.'
+        );
     }
 
     /**
      * Menyimpan kategori baru.
      */
-    public function store(Request $request): JsonResponse
-    {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255|unique:categories,name',
-        ]);
+    public function store(StoreCategoryRequest $request): JsonResponse
+{
+    $category = Category::create($request->validated());
 
-        $category = Category::create($validated);
-
-        return response()->json($category, 201);
-    }
-
-    /**
-     * Menampilkan satu kategori.
-     */
-    public function show(Category $category): JsonResponse
-    {
-        return response()->json($category, 200);
-    }
+    return $this->successResponse(
+        $category,
+        'Kategori berhasil ditambahkan.',
+        201
+    );
+}
 
     /**
      * Mengubah data kategori.
@@ -53,7 +49,10 @@ class CategoryController extends Controller
 
         $category->update($validated);
 
-        return response()->json($category, 200);
+        return $this->successResponse(
+            $category,
+            'Kategori berhasil diperbarui.'
+        );
     }
 
     /**
@@ -63,6 +62,9 @@ class CategoryController extends Controller
     {
         $category->delete();
 
-        return response()->json(null, 204);
+        return $this->successResponse(
+            null,
+            'Kategori berhasil dihapus.'
+        );
     }
 }

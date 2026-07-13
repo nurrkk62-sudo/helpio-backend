@@ -89,16 +89,20 @@ Route::middleware('auth:sanctum')->group(function () {
 
     /*
     |--------------------------------------------------------------------------
-    | Expert Routes
+    | Expert Routes (Dilindungi Auth & Throttle)
     |--------------------------------------------------------------------------
     */
 
-    Route::apiResource(
-        'experts',
-        ExpertController::class
-    )->except([
-        'destroy',
-    ]);
+    Route::middleware([
+        'throttle:60,1',
+    ])->group(function () {
+        Route::apiResource(
+            'experts',
+            ExpertController::class
+        )->except([
+            'destroy',
+        ]);
+    });
 
     Route::delete(
         '/experts/{expert}',
