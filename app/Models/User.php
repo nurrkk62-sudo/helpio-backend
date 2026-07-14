@@ -66,4 +66,14 @@ class User extends Authenticatable
             OtpVerification::class
         );
     }
+
+    /**
+     * Relasi user dengan pesanan.
+     */
+    public function orders(): HasMany
+    {
+        return $this->hasMany(
+            Order::class
+        );
+    }
 }
