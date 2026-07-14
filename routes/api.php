@@ -113,6 +113,11 @@ Route::middleware('auth:sanctum')->group(function () {
         [OrderController::class, 'expertOrders']
     );
 
+    Route::patch(
+        '/orders/{order}/status',
+        [OrderController::class, 'updateStatus']
+    );
+
     /*
     |--------------------------------------------------------------------------
     | Category Routes

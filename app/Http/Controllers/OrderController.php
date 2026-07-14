@@ -3,17 +3,24 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreOrderRequest;
+use App\Http\Requests\UpdateOrderStatusRequest;
+use App\Models\Order;
 use App\Services\OrderService;
+use App\Services\OrderStateService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class OrderController extends BaseController
 {
     public function __construct(
-        protected OrderService $service
+        protected OrderService $service,
+        protected OrderStateService $stateService
     ) {
     }
 
+    /**
+     * User membuat pesanan baru.
+     */
     public function store(
         StoreOrderRequest $request
     ): JsonResponse {
@@ -29,6 +36,9 @@ class OrderController extends BaseController
         );
     }
 
+    /**
+     * Menampilkan pesanan milik user.
+     */
     public function userOrders(
         Request $request
     ): JsonResponse {
@@ -42,6 +52,9 @@ class OrderController extends BaseController
         );
     }
 
+    /**
+     * Menampilkan pesanan milik expert.
+     */
     public function expertOrders(
         Request $request
     ): JsonResponse {
@@ -52,6 +65,25 @@ class OrderController extends BaseController
         return $this->successResponse(
             $orders,
             'Data pesanan expert berhasil diambil.'
+        );
+    }
+
+    /**
+     * Mengubah status pesanan sesuai state machine.
+     */
+    public function updateStatus(
+        UpdateOrderStatusRequest $request,
+        Order $order
+    ): JsonResponse {
+        $order = $this->stateService->updateStatus(
+            $request->user(),
+            $order,
+            $request->validated('status')
+        );
+
+        return $this->successResponse(
+            $order,
+            'Status pesanan berhasil diperbarui.'
         );
     }
 }
