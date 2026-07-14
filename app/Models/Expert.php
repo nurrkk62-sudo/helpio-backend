@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Expert extends Model
 {
@@ -26,6 +27,17 @@ class Expert extends Model
         'verification_status',
     ];
 
+    protected function casts(): array
+    {
+        return [
+            'rating' => 'decimal:1',
+            'review_count' => 'integer',
+            'completed_jobs' => 'integer',
+            'starting_price' => 'decimal:2',
+            'verified' => 'boolean',
+        ];
+    }
+
     /**
      * Relasi Expert dimiliki oleh User.
      */
@@ -40,5 +52,15 @@ class Expert extends Model
     public function category(): BelongsTo
     {
         return $this->belongsTo(Category::class);
+    }
+
+    /**
+     * Relasi Expert memiliki banyak layanan.
+     */
+    public function services(): HasMany
+    {
+        return $this->hasMany(
+            ExpertService::class
+        );
     }
 }

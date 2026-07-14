@@ -3,6 +3,7 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ExpertController;
+use App\Http\Controllers\ExpertServiceController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -64,6 +65,27 @@ Route::prefix('auth')->group(function () {
 
 /*
 |--------------------------------------------------------------------------
+| Expert Service Public Routes
+|--------------------------------------------------------------------------
+*/
+
+Route::get(
+    '/expert-services',
+    [ExpertServiceController::class, 'index']
+);
+
+Route::get(
+    '/expert-services/{expertService}',
+    [ExpertServiceController::class, 'show']
+);
+
+Route::get(
+    '/experts/{expert}/services',
+    [ExpertServiceController::class, 'byExpert']
+);
+
+/*
+|--------------------------------------------------------------------------
 | Protected API Routes
 |--------------------------------------------------------------------------
 */
@@ -89,7 +111,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     /*
     |--------------------------------------------------------------------------
-    | Expert Routes (Dilindungi Auth & Throttle)
+    | Expert Routes
     |--------------------------------------------------------------------------
     */
 
@@ -108,4 +130,30 @@ Route::middleware('auth:sanctum')->group(function () {
         '/experts/{expert}',
         [ExpertController::class, 'destroy']
     )->middleware('role:admin');
+
+    /*
+    |--------------------------------------------------------------------------
+    | Expert Service Protected Routes
+    |--------------------------------------------------------------------------
+    */
+
+    Route::post(
+        '/expert-services',
+        [ExpertServiceController::class, 'store']
+    )->middleware('role:expert');
+
+    Route::put(
+        '/expert-services/{expertService}',
+        [ExpertServiceController::class, 'update']
+    )->middleware('role:expert');
+
+    Route::patch(
+        '/expert-services/{expertService}',
+        [ExpertServiceController::class, 'update']
+    )->middleware('role:expert');
+
+    Route::delete(
+        '/expert-services/{expertService}',
+        [ExpertServiceController::class, 'destroy']
+    )->middleware('role:expert');
 });
