@@ -4,6 +4,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ExpertController;
 use App\Http\Controllers\ExpertServiceController;
+use App\Http\Controllers\OrderController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -91,6 +92,27 @@ Route::get(
 */
 
 Route::middleware('auth:sanctum')->group(function () {
+    /*
+    |--------------------------------------------------------------------------
+    | Order Routes
+    |--------------------------------------------------------------------------
+    */
+
+    Route::post(
+        '/orders',
+        [OrderController::class, 'store']
+    );
+
+    Route::get(
+        '/orders/user',
+        [OrderController::class, 'userOrders']
+    );
+
+    Route::get(
+        '/orders/expert',
+        [OrderController::class, 'expertOrders']
+    );
+
     /*
     |--------------------------------------------------------------------------
     | Category Routes

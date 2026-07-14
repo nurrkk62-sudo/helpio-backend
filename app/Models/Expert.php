@@ -11,6 +11,9 @@ class Expert extends Model
 {
     use HasFactory;
 
+    /**
+     * Atribut yang boleh diisi secara mass assignment.
+     */
     protected $fillable = [
         'user_id',
         'category_id',
@@ -27,6 +30,9 @@ class Expert extends Model
         'verification_status',
     ];
 
+    /**
+     * Casting atribut model.
+     */
     protected function casts(): array
     {
         return [
@@ -43,7 +49,9 @@ class Expert extends Model
      */
     public function user(): BelongsTo
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(
+            User::class
+        );
     }
 
     /**
@@ -51,7 +59,9 @@ class Expert extends Model
      */
     public function category(): BelongsTo
     {
-        return $this->belongsTo(Category::class);
+        return $this->belongsTo(
+            Category::class
+        );
     }
 
     /**
@@ -61,6 +71,16 @@ class Expert extends Model
     {
         return $this->hasMany(
             ExpertService::class
+        );
+    }
+
+    /**
+     * Relasi Expert memiliki banyak pesanan.
+     */
+    public function orders(): HasMany
+    {
+        return $this->hasMany(
+            Order::class
         );
     }
 }
