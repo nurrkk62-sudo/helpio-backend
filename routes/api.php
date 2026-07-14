@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ExpertController;
@@ -108,6 +109,66 @@ Route::middleware('auth:sanctum')->group(function () {
 
     /*
     |--------------------------------------------------------------------------
+    | Admin Routes
+    |--------------------------------------------------------------------------
+    */
+
+    Route::prefix('admin')
+        ->middleware('role:admin')
+        ->group(function () {
+            Route::get(
+                '/dashboard',
+                [AdminController::class, 'dashboard']
+            );
+
+            Route::get(
+                '/statistics',
+                [AdminController::class, 'statistics']
+            );
+
+            Route::get(
+                '/users',
+                [AdminController::class, 'users']
+            );
+
+            Route::get(
+                '/experts',
+                [AdminController::class, 'experts']
+            );
+
+            Route::get(
+                '/orders',
+                [AdminController::class, 'orders']
+            );
+
+            Route::get(
+                '/orders/{order}',
+                [AdminController::class, 'orderDetail']
+            );
+
+            Route::patch(
+                '/orders/{order}/status',
+                [AdminController::class, 'updateOrderStatus']
+            );
+
+            Route::get(
+                '/expert-verifications',
+                [AdminController::class, 'verifications']
+            );
+
+            Route::get(
+                '/expert-verifications/pending',
+                [ExpertVerificationController::class, 'pending']
+            );
+
+            Route::patch(
+                '/expert-verifications/{expertVerification}',
+                [ExpertVerificationController::class, 'review']
+            );
+        });
+
+    /*
+    |--------------------------------------------------------------------------
     | Order Routes
     |--------------------------------------------------------------------------
     */
@@ -158,22 +219,6 @@ Route::middleware('auth:sanctum')->group(function () {
         '/expert-verifications/me',
         [ExpertVerificationController::class, 'me']
     )->middleware('role:expert');
-
-    /*
-    |--------------------------------------------------------------------------
-    | Admin Expert Verification Routes
-    |--------------------------------------------------------------------------
-    */
-
-    Route::get(
-        '/admin/expert-verifications/pending',
-        [ExpertVerificationController::class, 'pending']
-    )->middleware('role:admin');
-
-    Route::patch(
-        '/admin/expert-verifications/{expertVerification}',
-        [ExpertVerificationController::class, 'review']
-    )->middleware('role:admin');
 
     /*
     |--------------------------------------------------------------------------
