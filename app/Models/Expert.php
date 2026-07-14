@@ -6,14 +6,12 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Expert extends Model
 {
     use HasFactory;
 
-    /**
-     * Atribut yang boleh diisi secara mass assignment.
-     */
     protected $fillable = [
         'user_id',
         'category_id',
@@ -30,9 +28,6 @@ class Expert extends Model
         'verification_status',
     ];
 
-    /**
-     * Casting atribut model.
-     */
     protected function casts(): array
     {
         return [
@@ -44,9 +39,6 @@ class Expert extends Model
         ];
     }
 
-    /**
-     * Relasi Expert dimiliki oleh User.
-     */
     public function user(): BelongsTo
     {
         return $this->belongsTo(
@@ -54,9 +46,6 @@ class Expert extends Model
         );
     }
 
-    /**
-     * Relasi Expert dimiliki oleh Category.
-     */
     public function category(): BelongsTo
     {
         return $this->belongsTo(
@@ -64,9 +53,6 @@ class Expert extends Model
         );
     }
 
-    /**
-     * Relasi Expert memiliki banyak layanan.
-     */
     public function services(): HasMany
     {
         return $this->hasMany(
@@ -74,9 +60,6 @@ class Expert extends Model
         );
     }
 
-    /**
-     * Relasi Expert memiliki banyak pesanan.
-     */
     public function orders(): HasMany
     {
         return $this->hasMany(
@@ -84,13 +67,17 @@ class Expert extends Model
         );
     }
 
-    /**
-     * Relasi Expert memiliki banyak review.
-     */
     public function reviews(): HasMany
     {
         return $this->hasMany(
             Review::class
+        );
+    }
+
+    public function verification(): HasOne
+    {
+        return $this->hasOne(
+            ExpertVerification::class
         );
     }
 }

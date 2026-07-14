@@ -4,6 +4,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ExpertController;
 use App\Http\Controllers\ExpertServiceController;
+use App\Http\Controllers\ExpertVerificationController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ReviewController;
 use Illuminate\Http\Request;
@@ -104,6 +105,7 @@ Route::get(
 */
 
 Route::middleware('auth:sanctum')->group(function () {
+
     /*
     |--------------------------------------------------------------------------
     | Order Routes
@@ -140,6 +142,38 @@ Route::middleware('auth:sanctum')->group(function () {
         '/reviews',
         [ReviewController::class, 'store']
     )->middleware('role:user');
+
+    /*
+    |--------------------------------------------------------------------------
+    | Expert Verification Routes
+    |--------------------------------------------------------------------------
+    */
+
+    Route::post(
+        '/expert-verifications',
+        [ExpertVerificationController::class, 'store']
+    )->middleware('role:expert');
+
+    Route::get(
+        '/expert-verifications/me',
+        [ExpertVerificationController::class, 'me']
+    )->middleware('role:expert');
+
+    /*
+    |--------------------------------------------------------------------------
+    | Admin Expert Verification Routes
+    |--------------------------------------------------------------------------
+    */
+
+    Route::get(
+        '/admin/expert-verifications/pending',
+        [ExpertVerificationController::class, 'pending']
+    )->middleware('role:admin');
+
+    Route::patch(
+        '/admin/expert-verifications/{expertVerification}',
+        [ExpertVerificationController::class, 'review']
+    )->middleware('role:admin');
 
     /*
     |--------------------------------------------------------------------------
