@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Order extends Model
 {
@@ -38,13 +39,33 @@ class Order extends Model
         ];
     }
 
+    /**
+     * Relasi order dengan user.
+     */
     public function user(): BelongsTo
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(
+            User::class
+        );
     }
 
+    /**
+     * Relasi order dengan expert.
+     */
     public function expert(): BelongsTo
     {
-        return $this->belongsTo(Expert::class);
+        return $this->belongsTo(
+            Expert::class
+        );
+    }
+
+    /**
+     * Satu order hanya memiliki satu review.
+     */
+    public function review(): HasOne
+    {
+        return $this->hasOne(
+            Review::class
+        );
     }
 }

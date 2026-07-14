@@ -54,7 +54,9 @@ class User extends Authenticatable
      */
     public function expert(): HasOne
     {
-        return $this->hasOne(Expert::class);
+        return $this->hasOne(
+            Expert::class
+        );
     }
 
     /**
@@ -74,6 +76,16 @@ class User extends Authenticatable
     {
         return $this->hasMany(
             Order::class
+        );
+    }
+
+    /**
+     * Relasi user dengan review.
+     */
+    public function reviews(): HasMany
+    {
+        return $this->hasMany(
+            Review::class
         );
     }
 }

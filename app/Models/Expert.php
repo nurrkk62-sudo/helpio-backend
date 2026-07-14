@@ -83,4 +83,14 @@ class Expert extends Model
             Order::class
         );
     }
+
+    /**
+     * Relasi Expert memiliki banyak review.
+     */
+    public function reviews(): HasMany
+    {
+        return $this->hasMany(
+            Review::class
+        );
+    }
 }

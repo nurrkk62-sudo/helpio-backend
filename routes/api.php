@@ -5,6 +5,7 @@ use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ExpertController;
 use App\Http\Controllers\ExpertServiceController;
 use App\Http\Controllers\OrderController;
+use App\Http\Controllers\ReviewController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -66,7 +67,7 @@ Route::prefix('auth')->group(function () {
 
 /*
 |--------------------------------------------------------------------------
-| Expert Service Public Routes
+| Public Expert Service Routes
 |--------------------------------------------------------------------------
 */
 
@@ -83,6 +84,17 @@ Route::get(
 Route::get(
     '/experts/{expert}/services',
     [ExpertServiceController::class, 'byExpert']
+);
+
+/*
+|--------------------------------------------------------------------------
+| Public Review Routes
+|--------------------------------------------------------------------------
+*/
+
+Route::get(
+    '/experts/{expert}/reviews',
+    [ReviewController::class, 'byExpert']
 );
 
 /*
@@ -117,6 +129,17 @@ Route::middleware('auth:sanctum')->group(function () {
         '/orders/{order}/status',
         [OrderController::class, 'updateStatus']
     );
+
+    /*
+    |--------------------------------------------------------------------------
+    | Review Routes
+    |--------------------------------------------------------------------------
+    */
+
+    Route::post(
+        '/reviews',
+        [ReviewController::class, 'store']
+    )->middleware('role:user');
 
     /*
     |--------------------------------------------------------------------------
